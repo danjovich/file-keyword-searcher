@@ -1,8 +1,8 @@
 import { type ReactElement } from "react";
-import fetchRawDocumentAndApplyCallback from "../../app/utils/fetchRawDocumentAndApplyCallback";
+import fetchRawDocumentAndApplyCallback from "../../utils/fetchRawDocumentAndApplyCallback";
 import mammoth from "mammoth";
 import XLSX from "xlsx";
-import getTextFromPDF from "@/app/utils/getTextFromPDF";
+import getTextFromPDF from "@/utils/getTextFromPDF";
 import DocumentViewer from "./DocumentViewer";
 import {
   Carousel,
@@ -12,13 +12,7 @@ import {
   CarouselPrevious,
 } from "../ui/carousel";
 import fileTypes from "@/config/fileTypes";
-
-interface DocumentViewerProps {
-  documents: {
-    uri: string;
-    type: string;
-  }[];
-}
+import { useDocuments } from "@/hooks/useDocuments";
 
 const getDocumentFetcher = (
   mimetype: keyof typeof fileTypes.extensionMyMimetype
@@ -47,21 +41,16 @@ const getDocumentFetcher = (
   }
 };
 
-export default function DocumentsViewer({
-  documents,
-}: DocumentViewerProps): ReactElement {
-  // const [htmls, setHtmls] = useState<string[]>([]);
-  // useEffect(() => {
-  //   documents.forEach(({ uri, type }) => {
-  //     console.log(type);
-  //   });
-  // }, [documents]);
+export default function DocumentsViewer(): ReactElement {
+  const { documents } = useDocuments();
 
   return (
     <>
-      <Carousel className="w-full max-w-xs">
-        <CarouselPrevious />
-        <CarouselNext />
+      <Carousel className="w-full" opts={{ dragFree: true, watchDrag: false }}>
+        <div>
+          <CarouselPrevious className="relative left-auto" />
+          <CarouselNext className="relative left-auto" />
+        </div>
         <CarouselContent>
           {documents.map((document) => (
             <CarouselItem key={document.uri}>
@@ -72,6 +61,7 @@ export default function DocumentsViewer({
                     document.type as keyof typeof fileTypes.extensionMyMimetype
                   )}
                   index={documents.indexOf(document)}
+                  type={document.type}
                 />
               </div>
             </CarouselItem>

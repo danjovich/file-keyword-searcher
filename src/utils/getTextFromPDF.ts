@@ -23,12 +23,22 @@ export default async function getTextFromPDF(pdfUrl: string) {
         const textContent = page_1.getTextContent({
           includeMarkedContent: false,
         });
+
         const text = await textContent;
-        return text.items
-          .map(function (s) {
-            return (s as TextItem).str;
-          })
-          .join("");
+
+        let lastY = -1;
+        let res = "<p>";
+        text.items.forEach(function (s) {
+          s = s as TextItem;
+          // Tracking Y-coord and if changed create new p-tag
+          if (lastY != s.transform[5]) {
+            res += "</p><p>";
+            lastY = s.transform[5];
+          }
+          res += s.str;
+        });
+
+        return res;
       })
     );
   }

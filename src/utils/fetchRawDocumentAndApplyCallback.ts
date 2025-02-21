@@ -19,6 +19,5 @@ export default async function fetchRawDocumentAndApplyCallback<T>(
 ): Promise<T> {
   const fetchedDocument = await fetch(uri);
   const arrayBuffer = await fetchedDocument.arrayBuffer();
-  console.log(arrayBuffer);
   return await callback(arrayBuffer);
 }

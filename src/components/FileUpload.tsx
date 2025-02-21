@@ -2,16 +2,12 @@
 
 import { ChangeEvent, FormEvent, useRef, type ReactElement } from "react";
 import fileTypes from "@/config/fileTypes";
-import { PutBlobResult } from "@vercel/blob";
 import { upload } from "@vercel/blob/client";
+import { useDocuments } from "@/hooks/useDocuments";
 
-interface FileUploadProps {
-  setBlobs: React.Dispatch<React.SetStateAction<PutBlobResult[]>>;
-}
+export default function FileUpload(): ReactElement {
+  const { setDocuments } = useDocuments();
 
-export default function FileUpload({
-  setBlobs,
-}: FileUploadProps): ReactElement {
   const onChangeFile = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ?? [];
 
@@ -36,12 +32,19 @@ export default function FileUpload({
     const files = inputFileRef.current.files ?? [];
 
     for (const file of files) {
-      const newBlob = await upload(file.name, file, {
+      const blob = await upload(file.name, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
       });
 
-      setBlobs((prevBlobs) => [...prevBlobs, newBlob]);
+      setDocuments((prevDocuments) => [
+        ...prevDocuments,
+        {
+          uri: blob.url,
+          type: blob.contentType,
+          content: "",
+        },
+      ]);
     }
   };
 
