@@ -5,6 +5,8 @@ import DocxViewer from "./DocxViewer";
 import { ErrorBoundary } from "react-error-boundary";
 import fetchRawDocumentAndApplyCallback from "../utils/fetchRawDocumentAndApplyCallback";
 import mammoth from "mammoth";
+import XlsxViewer from "./XlsxViewer";
+import XLSX from "xlsx";
 
 interface DocumentViewerProps {
   documents: {
@@ -19,9 +21,10 @@ export default function DocumentViewer({
   return (
     <>
       {documents.map((document) =>
-        // if the document is a .docx file, we  fetch it 
+        // if the document is a .docx file, we  fetch it
         // and convert it to HTML using mammoth
-        document.type === fileTypes.mimeTypeByExtension[".docx"] ? (
+        document.type === fileTypes.mimeTypeByExtension[".docx"] ||
+        document.type === fileTypes.mimeTypeByExtension[".doc"] ? (
           <ErrorBoundary
             key={document.uri}
             fallback={<p>⚠️ Something went wrong!</p>}
@@ -31,6 +34,27 @@ export default function DocumentViewer({
                 documentPromise={fetchRawDocumentAndApplyCallback(
                   document.uri,
                   (arrayBuffer) => mammoth.convertToHtml({ arrayBuffer })
+                )}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        ) : document.type === fileTypes.mimeTypeByExtension[".xlsx"] ? (
+          <ErrorBoundary
+            key={document.uri}
+            fallback={<p>⚠️ Something went wrong!</p>}
+          >
+            <Suspense fallback={<p>Loading document...</p>}>
+              <XlsxViewer
+                key={document.uri}
+                documentPromise={fetchRawDocumentAndApplyCallback(
+                  document.uri,
+                  (arrayBuffer) => {
+                    const wb = XLSX.read(arrayBuffer);
+                    const html = XLSX.utils.sheet_to_html(
+                      wb.Sheets[wb.SheetNames[0]]
+                    );
+                    return html;
+                  }
                 )}
               />
             </Suspense>
