@@ -33,28 +33,28 @@ export function DocumentsProvider({ children }: { children: React.ReactNode }) {
   const setSearchQuery = (query: string) => {
     // reset documents
     setShownDocuments(documents);
-    
+
     if (!query) {
       return;
     }
 
     // add marks to matches
-    const documentsWithMarks = documents.map((document) =>{ 
+    const documentsWithMarks = documents.map((document) => {
       console.log(
         document.content.replaceAll(
           query.toLowerCase(),
           `<mark>${query}</mark>`
         )
       );
-      
-      return ({
-      ...document,
-      content: document.content.replaceAll(
-        query.toLowerCase(),
-        `<mark>${query}</mark>`
-      ),
-    })});
-  
+
+      const sanitizedQuery = query.replaceAll(/[#-.]|[[-^]|[?|{}]/g, "\\$&");
+      const regex = new RegExp(sanitizedQuery, "ig");
+      return {
+        ...document,
+        content: document.content.replaceAll(regex, `<mark>$&</mark>`),
+      };
+    });
+
     setShownDocuments(documentsWithMarks);
   };
 
