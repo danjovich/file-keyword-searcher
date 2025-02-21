@@ -3,10 +3,12 @@ import DocViewer from "@cyntler/react-doc-viewer";
 import { Suspense, type ReactElement } from "react";
 import DocxViewer from "./DocxViewer";
 import { ErrorBoundary } from "react-error-boundary";
-import fetchRawDocumentAndApplyCallback from "../utils/fetchRawDocumentAndApplyCallback";
+import fetchRawDocumentAndApplyCallback from "../../app/utils/fetchRawDocumentAndApplyCallback";
 import mammoth from "mammoth";
 import XlsxViewer from "./XlsxViewer";
 import XLSX from "xlsx";
+import PdfViewer from "./PdfViewer";
+import getTextFromPDF from "@/app/utils/getTextFromPDF";
 
 interface DocumentViewerProps {
   documents: {
@@ -23,8 +25,7 @@ export default function DocumentViewer({
       {documents.map((document) =>
         // if the document is a .docx file, we  fetch it
         // and convert it to HTML using mammoth
-        document.type === fileTypes.mimeTypeByExtension[".docx"] ||
-        document.type === fileTypes.mimeTypeByExtension[".doc"] ? (
+        document.type === fileTypes.mimeTypeByExtension[".docx"] ? (
           <ErrorBoundary
             key={document.uri}
             fallback={<p>⚠️ Something went wrong!</p>}
@@ -56,6 +57,25 @@ export default function DocumentViewer({
                     return html;
                   }
                 )}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        ) : document.type === fileTypes.mimeTypeByExtension[".pdf"] ? (
+          <ErrorBoundary
+            key={document.uri}
+            fallback={<p>⚠️ Something went wrong!</p>}
+          >
+            <Suspense fallback={<p>Loading document...</p>}>
+              <PdfViewer
+                key={document.uri}
+                // documentPromise={fetch("/api/file2html", {
+                //   method: "POST",
+                //   headers: {
+                //     "Content-Type": "application/json",
+                //   },
+                //   body: JSON.stringify({ uri: document.uri }),
+                // }).then((res) => res.text())}
+                documentPromise={getTextFromPDF(document.uri)}
               />
             </Suspense>
           </ErrorBoundary>
