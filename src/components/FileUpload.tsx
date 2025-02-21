@@ -46,6 +46,8 @@ export default function FileUpload(): ReactElement {
         },
       ]);
     }
+
+    inputFileRef.current.value = "";
   };
 
   return (
