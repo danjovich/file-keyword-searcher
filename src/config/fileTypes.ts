@@ -1,16 +1,16 @@
 // only .pdf, .docx, .doc and .xlsx files are allowed
-const mimeTypeByExtension = {
-  ".pdf": "application/pdf",
-  ".doc": "application/msword",
-  ".docx":
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-};
+const extensionMyMimetype = {
+  "application/pdf": ".pdf",
+  "application/msword": ".doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    ".docx",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
+} as const;
 
 const fileTypes = {
-  mimeTypeByExtension,
-  extensions: Object.keys(mimeTypeByExtension),
-  mimeTypes: Object.values(mimeTypeByExtension),
+  extensionMyMimetype,
+  extensions: Object.values(extensionMyMimetype),
+  mimeTypes: Object.keys(extensionMyMimetype),
 };
 
 export default fileTypes;
