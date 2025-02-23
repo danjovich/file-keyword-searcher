@@ -63,8 +63,8 @@ export default function DocumentsViewer(): ReactElement {
         opts={{ dragFree: true, watchDrag: false }}
         setApi={setApi}
       >
-        <div className="flex justify-between items-center w-full">
-          <div>
+        <div className="flex flex-col lg:flex-row justify-between items-center w-full">
+          <div className="-ml-10 lg:ml-0">
             <CarouselPrevious className="relative left-auto" />
             <CarouselNext className="relative left-auto" />
           </div>
@@ -77,10 +77,10 @@ export default function DocumentsViewer(): ReactElement {
           {/* Only for centering the previous div */}
           <div />
         </div>
-        <CarouselContent>
+        <CarouselContent className="w-full">
           {documents.map((document) => (
-            <CarouselItem key={document.uri} className="p-6">
-              <div className="p-3 border-[1px] border-slate-700 rounded-md">
+            <CarouselItem key={document.uri} className="p-6 w-full">
+              <div className="p-3 border-[1px] border-slate-700 rounded-md w-full">
                 <DocumentViewer html={document.content} />
               </div>
             </CarouselItem>
