@@ -6,6 +6,8 @@ import { useDebouncedCallback } from "use-debounce";
 export default function SearchInput(): ReactElement {
   const { setSearchQuery, thereAreUploadedDocuments } = useDocuments();
 
+  // debounce the search query to avoid unnecessary re-renders
+  // on every key stroke
   const debounce = useDebouncedCallback((value: string) => {
     setSearchQuery(value);
   }, 300);
