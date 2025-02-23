@@ -3,9 +3,9 @@ import { Input } from "../ui/input";
 import { useDocuments } from "@/hooks/useDocuments";
 
 export default function SearchInput(): ReactElement {
-  const { setSearchQuery, documents } = useDocuments();
+  const { setSearchQuery, thereAreUploadedDocuments } = useDocuments();
 
-  return documents.length > 0 ? (
+  return thereAreUploadedDocuments ? (
     <Input
       placeholder="Search the documents..."
       onChange={(e) => setSearchQuery(e.target.value)}

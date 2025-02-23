@@ -2,9 +2,9 @@ import { useDocuments } from "@/hooks/useDocuments";
 import { type ReactElement } from "react";
 
 export default function Header(): ReactElement {
-  const { documents } = useDocuments();
+  const { thereAreUploadedDocuments } = useDocuments();
 
-  if (documents.length > 0) {
+  if (thereAreUploadedDocuments) {
     return <></>;
   }
 

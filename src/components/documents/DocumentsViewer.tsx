@@ -1,8 +1,4 @@
 import { useEffect, useMemo, useState, type ReactElement } from "react";
-import fetchRawDocumentAndApplyCallback from "../../utils/fetchRawDocumentAndApplyCallback";
-import mammoth from "mammoth";
-import XLSX from "xlsx";
-import getTextFromPDF from "@/utils/getTextFromPDF";
 import DocumentViewer from "./DocumentViewer";
 import {
   Carousel,
@@ -13,42 +9,9 @@ import {
   CarouselPrevious,
 } from "../ui/carousel";
 import { useDocuments } from "@/hooks/useDocuments";
-import doc2docx from "@/utils/doc2docx";
-import { extensionsByMimetype, FileMimeType } from "@/config/fileTypes";
-
-const getDocumentFetcher = (
-  mimetype: FileMimeType
-): ((uri: string) => Promise<string>) => {
-  const extension = extensionsByMimetype[mimetype];
-
-  switch (extension) {
-    case ".docx":
-      return (uri: string) =>
-        fetchRawDocumentAndApplyCallback(uri, (arrayBuffer) =>
-          mammoth.convertToHtml({ arrayBuffer }).then((result) => result.value)
-        );
-    case ".xlsx":
-      return (uri: string) =>
-        fetchRawDocumentAndApplyCallback(uri, (arrayBuffer) => {
-          const wb = XLSX.read(arrayBuffer);
-          const html = XLSX.utils.sheet_to_html(wb.Sheets[wb.SheetNames[0]]);
-          return html;
-        });
-    case ".pdf":
-      return (uri: string) => getTextFromPDF(uri);
-    case ".doc":
-      return async (uri: string): Promise<string> => {
-        const docxUrl = await doc2docx(uri);
-        return await getDocumentFetcher(FileMimeType.DOCX)(docxUrl);
-      };
-    default:
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      return async (_: string) => "";
-  }
-};
 
 export default function DocumentsViewer(): ReactElement {
-  const { documents } = useDocuments();
+  const { documents, thereAreUploadedDocuments } = useDocuments();
 
   // carousel api
   const [api, setApi] = useState<CarouselApi | undefined>();
@@ -72,7 +35,7 @@ export default function DocumentsViewer(): ReactElement {
     });
   }, [api]);
 
-  if (documents.length === 0) {
+  if (!thereAreUploadedDocuments) {
     return (
       <p className="w-full text-center">Upload a document to get started!</p>
     );
@@ -101,15 +64,9 @@ export default function DocumentsViewer(): ReactElement {
         </div>
         <CarouselContent>
           {documents.map((document) => (
-            <CarouselItem key={document.uri + document.content} className="p-6">
+            <CarouselItem key={document.uri} className="p-6">
               <div className="p-3 border-[1px] border-slate-700 rounded-md">
-                <DocumentViewer
-                  uri={document.uri}
-                  getHtml={getDocumentFetcher(document.type as FileMimeType)}
-                  index={documents.indexOf(document)}
-                  type={document.type}
-                  name={document.name}
-                />
+                <DocumentViewer html={document.content} />
               </div>
             </CarouselItem>
           ))}

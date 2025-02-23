@@ -1,35 +1,54 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-interface DocumentsContextType {
-  documents: {
-    uri: string;
-    content: string;
-    type: string;
-    name: string;
-  }[];
-  setDocuments: React.Dispatch<
-    React.SetStateAction<DocumentsContextType["documents"]>
-  >;
-  setSearchQuery: (query: string) => void;
+interface Document {
+  uri: string;
+  content: string;
+  type: string;
+  name: string;
 }
 
-const DocumentsContext = React.createContext<DocumentsContextType | undefined>(
+interface DocumentsContextType {
+  /**
+   * Documents to be displayed (if search query is not empty, it will contain highlights).
+   */
+  documents: Document[];
+  /**
+   * Adds a document to the list of documents.
+   *
+   * @param document - The document to add.
+   * @returns
+   */
+  addDocument: (document: Document) => void;
+  /**
+   * Sets the search query for the documents, marking the matches and filtering out the non-matching documents.
+   *
+   * @param query
+   * @returns
+   */
+  setSearchQuery: (query: string) => void;
+  /**
+   * Whether there are uploaded documents.
+   */
+  thereAreUploadedDocuments: boolean;
+}
+
+const DocumentsContext = createContext<DocumentsContextType | undefined>(
   undefined
 );
 
 export function DocumentsProvider({ children }: { children: React.ReactNode }) {
-  const [documents, setDocuments] = useState<DocumentsContextType["documents"]>(
-    []
-  );
-  const [shownDocuments, setShownDocuments] = useState<
-    DocumentsContextType["documents"]
-  >([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [shownDocuments, setShownDocuments] = useState<Document[]>([]);
 
   useEffect(() => {
     setShownDocuments(documents);
   }, [documents, documents.length]);
+
+  const addDocument = (document: Document) => {
+    setDocuments((prev) => [...prev, document]);
+  };
 
   const setSearchQuery = (query: string) => {
     // reset documents
@@ -38,23 +57,26 @@ export function DocumentsProvider({ children }: { children: React.ReactNode }) {
     if (!query) {
       return;
     }
-
-    // add marks to matches
     const documentsWithMarks = documents
       .map((document) => {
-        console.log(
-          document.content.replaceAll(
-            query.toLowerCase(),
-            `<mark>${query}</mark>`
-          )
+        // escape regex special characters
+        const sanitizedQuery = query.replaceAll(
+          /[#-.]|[[-^]|[?|{}()]/g,
+          "\\$&"
         );
+        // regex to ignore HTML tags
+        const ignoringTagsQuery = `(?<=<[^>]*>[^<>]*?)(${sanitizedQuery})(?=[^<>]*?<[^>]*>)`;
+        console.log(ignoringTagsQuery);
+        // create regex
+        const regex = new RegExp(ignoringTagsQuery, "ig");
 
-        const sanitizedQuery = query.replaceAll(/[#-.]|[[-^]|[?|{}]/g, "\\$&");
-        const regex = new RegExp(sanitizedQuery, "ig");
+        // add marks to matches
+        const content = document.content.replaceAll(regex, `<mark>$1</mark>`);
+
         return {
           ...document,
-          matches: document.content.match(regex),
-          content: document.content.replaceAll(regex, `<mark>$&</mark>`),
+          content,
+          matches: content.length !== document.content.length,
         };
       })
       // filter out documents without matches
@@ -63,9 +85,19 @@ export function DocumentsProvider({ children }: { children: React.ReactNode }) {
     setShownDocuments(documentsWithMarks);
   };
 
+  const thereAreUploadedDocuments = useMemo(
+    () => Object.keys(documents).length > 0,
+    [documents]
+  );
+
   return (
     <DocumentsContext.Provider
-      value={{ documents: shownDocuments, setDocuments, setSearchQuery }}
+      value={{
+        documents: shownDocuments,
+        addDocument,
+        setSearchQuery,
+        thereAreUploadedDocuments,
+      }}
     >
       {children}
     </DocumentsContext.Provider>
@@ -73,7 +105,7 @@ export function DocumentsProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useDocuments(): DocumentsContextType {
-  const context = React.useContext(DocumentsContext);
+  const context = useContext(DocumentsContext);
   if (context === undefined) {
     throw new Error("useDocuments must be used within a DocumentsProvider");
   }

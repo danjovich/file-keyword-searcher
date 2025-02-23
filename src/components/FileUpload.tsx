@@ -13,9 +13,10 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LoadingSpinner } from "./ui/loading-spinner";
 import { FileExtension, FileMimeType } from "@/config/fileTypes";
+import getDocumentConverterToHtml from "@/utils/getDocumentConverterToHtml";
 
 export default function FileUpload(): ReactElement {
-  const { setDocuments } = useDocuments();
+  const { addDocument } = useDocuments();
   const [buttonEnabled, setButtonEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -54,15 +55,17 @@ export default function FileUpload(): ReactElement {
         handleUploadUrl: "/api/upload",
       });
 
-      setDocuments((prevDocuments) => [
-        ...prevDocuments,
-        {
-          uri: blob.url,
-          type: blob.contentType,
-          content: "",
-          name: blob.pathname,
-        },
-      ]);
+      const toHtml = getDocumentConverterToHtml(
+        blob.contentType as FileMimeType
+      );
+      const html = await toHtml(blob.url);
+
+      addDocument({
+        uri: blob.url,
+        type: blob.contentType,
+        content: html,
+        name: blob.pathname,
+      });
     }
 
     setLoading(false);
