@@ -86,7 +86,7 @@ export function DocumentsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const thereAreUploadedDocuments = useMemo(
-    () => Object.keys(documents).length > 0,
+    () => documents.length > 0,
     [documents]
   );
 
