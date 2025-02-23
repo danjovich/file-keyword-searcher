@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# McCarren Coding challenge
 
-## Getting Started
+This is a coding challenge created for an assignment from McCarren AI. The challenge is to create a simple web application that allows users to upload files and then display them with support for keyword search.
 
-First, run the development server:
+## Table of contents
+
+- [McCarren Coding challenge](#mccarren-coding-challenge)
+  - [Table of contents](#table-of-contents)
+  - [Running the application](#running-the-application)
+  - [How to use the application](#how-to-use-the-application)
+  - [Technologies used](#technologies-used)
+- [Deployment](#deployment)
+
+## Running the application
+
+For this project, `pnpm` was used as the package manager. To run the application, you need to have `pnpm` installed. If you don't have it installed, you can install it by running the following command:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install -g pnpm
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+After installing `pnpm`, you can run the following commands to install the dependencies run the application:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How to use the application
 
-## Learn More
+After running the application, you can access it by visiting `http://localhost:3000` in your browser. You will see a simple form that allows to choose and upload files, as shown below:
 
-To learn more about Next.js, take a look at the following resources:
+![Upload form](images/before-upload.png)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You will be able to upload `.doc`, `.docx`, `.pdf`, and `.xlsx` files. After uploading the files, the application will extract the text from the files and display them in a carousel. You can search for a specific keyword by typing it in the search box, as shown below:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+![File search](images/file-search.png)
 
-## Deploy on Vercel
+The search will filter the files based on the keyword you entered, and the found matches within the files will be highlighted. The search is case-insensitive.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Technologies used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+As requested, the application uses Next.js with JavaScript and vercel for deployment. Besides that, the following technologies were used:
+
+- [Tailwind CSS](https://tailwindcss.com/): for styling the application with ease.
+- [shadcn-ui](https://ui.shadcn.com/): as a UI library for a consistent design.
+- [mammoth](https://www.npmjs.com/package/mammoth): for extracting text from the uploaded `.docx` files.
+- [PDF.js](https://mozilla.github.io/pdf.js/): for extracting the text of the uploaded `.pdf` files.
+- [SheetJS](https://sheetjs.com/): for extracting the text of the uploaded `.xlsx` files.
+- [ConvertAPI](https://www.convertapi.com/): for converting the uploaded `.doc` files to `.docx` files, as there didn't seem to be a reliable way to extract text from `.doc` files directly on JavaScript (I'm using the free tier, with a 250 uploads limit).
+- [use-debounce](https://www.npmjs.com/package/use-debounce): for debouncing the search input to avoid searching on every keystroke.
+- [Vercel Blob Storage](https://vercel.com/docs/storage/vercel-blob): for storing the uploaded files.
+
+It is worth mentioning that, ideally, the application should be able to render all the uploaded files more reliably, instead of merely extracting text and a bit of formatting through HTML transformations. Initially, my idea was to use [@cyntler/react-doc-viewer](https://github.com/cyntler/react-doc-viewer), as it is able to render all the supported file types. However, it uses external resources such as embedded iframes from Word and Excel online, in which I would not be able to implement the search functionality. I decided to go with the current approach to meet the keyword search requirements of the challenge.
+
+The UI is fully responsive, which was easy thanks to Tailwind CSS and shadcn-ui.
+
+# Deployment
+
+The application is deployed on Vercel, and you can access it [here](https://file-keyword-searcher.vercel.app/).
