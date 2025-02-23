@@ -34,6 +34,7 @@ export default function DocumentViewer({
       console.error(error);
     },
     enabled: !html,
+    retry: false,
   });
 
   useEffect(() => {

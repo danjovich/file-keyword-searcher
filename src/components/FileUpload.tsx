@@ -7,12 +7,12 @@ import {
   useState,
   type ReactElement,
 } from "react";
-import fileTypes from "@/config/fileTypes";
 import { upload } from "@vercel/blob/client";
 import { useDocuments } from "@/hooks/useDocuments";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LoadingSpinner } from "./ui/loading-spinner";
+import { FileExtension, FileMimeType } from "@/config/fileTypes";
 
 export default function FileUpload(): ReactElement {
   const { setDocuments } = useDocuments();
@@ -23,7 +23,7 @@ export default function FileUpload(): ReactElement {
     const files = event.target.files ?? [];
 
     for (const file of files) {
-      if (!fileTypes.mimeTypes.includes(file.type)) {
+      if (!Object.values(FileMimeType).includes(file.type as FileMimeType)) {
         alert("Only .pdf, .docx, .doc and .xlsx files are allowed");
         event.target.value = "";
         setButtonEnabled(false);
@@ -76,7 +76,7 @@ export default function FileUpload(): ReactElement {
         <Input
           type="file"
           onChange={onChangeFile}
-          accept={fileTypes.extensions.join(",")}
+          accept={Object.values(FileExtension).join(",")}
           multiple
           ref={inputFileRef}
         />

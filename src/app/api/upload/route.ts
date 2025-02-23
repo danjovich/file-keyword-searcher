@@ -1,4 +1,4 @@
-import fileTypes from "@/config/fileTypes";
+import { FileMimeType } from "@/config/fileTypes";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 
@@ -11,7 +11,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       request,
       onBeforeGenerateToken: async () => {
         return {
-          allowedContentTypes: fileTypes.mimeTypes,
+          allowedContentTypes: Object.values(FileMimeType),
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {

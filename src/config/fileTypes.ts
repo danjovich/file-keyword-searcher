@@ -1,16 +1,21 @@
 // only .pdf, .docx, .doc and .xlsx files are allowed
-const extensionMyMimetype = {
-  "application/pdf": ".pdf",
-  "application/msword": ".doc",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-    ".docx",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
-} as const;
+export enum FileExtension {
+  PDF = ".pdf",
+  DOC = ".doc",
+  DOCX = ".docx",
+  XLSX = ".xlsx",
+}
 
-const fileTypes = {
-  extensionByMimetype: extensionMyMimetype,
-  extensions: Object.values(extensionMyMimetype),
-  mimeTypes: Object.keys(extensionMyMimetype),
+export enum FileMimeType {
+  PDF = "application/pdf",
+  DOC = "application/msword",
+  DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+}
+
+export const extensionsByMimetype = {
+  [FileMimeType.PDF]: FileExtension.PDF,
+  [FileMimeType.DOC]: FileExtension.DOC,
+  [FileMimeType.DOCX]: FileExtension.DOCX,
+  [FileMimeType.XLSX]: FileExtension.XLSX,
 };
-
-export default fileTypes;

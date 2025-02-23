@@ -12,13 +12,14 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "../ui/carousel";
-import fileTypes from "@/config/fileTypes";
 import { useDocuments } from "@/hooks/useDocuments";
+import doc2docx from "@/utils/doc2docx";
+import { extensionsByMimetype, FileMimeType } from "@/config/fileTypes";
 
 const getDocumentFetcher = (
-  mimetype: keyof typeof fileTypes.extensionByMimetype
-) => {
-  const extension = fileTypes.extensionByMimetype[mimetype];
+  mimetype: FileMimeType
+): ((uri: string) => Promise<string>) => {
+  const extension = extensionsByMimetype[mimetype];
 
   switch (extension) {
     case ".docx":
@@ -36,6 +37,10 @@ const getDocumentFetcher = (
     case ".pdf":
       return (uri: string) => getTextFromPDF(uri);
     case ".doc":
+      return async (uri: string): Promise<string> => {
+        const docxUrl = await doc2docx(uri);
+        return await getDocumentFetcher(FileMimeType.DOCX)(docxUrl);
+      };
     default:
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       return async (_: string) => "";
@@ -50,10 +55,10 @@ export default function DocumentsViewer(): ReactElement {
   // current selected document index (1-indexed)
   const [current, setCurrent] = useState(1);
 
-  const currentDocumentName = useMemo(() => documents[current - 1]?.name, [
-    documents,
-    current,
-  ]);
+  const currentDocumentName = useMemo(
+    () => documents[current - 1]?.name,
+    [documents, current]
+  );
 
   useEffect(() => {
     if (!api) {
@@ -100,9 +105,7 @@ export default function DocumentsViewer(): ReactElement {
               <div className="p-3 border-[1px] border-slate-700 rounded-md">
                 <DocumentViewer
                   uri={document.uri}
-                  getHtml={getDocumentFetcher(
-                    document.type as keyof typeof fileTypes.extensionByMimetype
-                  )}
+                  getHtml={getDocumentFetcher(document.type as FileMimeType)}
                   index={documents.indexOf(document)}
                   type={document.type}
                   name={document.name}
