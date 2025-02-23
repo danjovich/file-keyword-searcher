@@ -68,7 +68,7 @@ export default function DocumentsViewer(): ReactElement {
             <CarouselPrevious className="relative left-auto" />
             <CarouselNext className="relative left-auto" />
           </div>
-          <div className="text-center -mt-5">
+          <div className="text-center lg:-mt-5">
             <h2 className="text-xl font-bold">{currentDocumentName}</h2>
             <p className="text-sm text-gray-600">
               Document <b>{current}</b> out of <b>{documents.length}</b>
