@@ -66,7 +66,6 @@ export function DocumentsProvider({ children }: { children: React.ReactNode }) {
         );
         // regex to ignore HTML tags
         const ignoringTagsQuery = `(?<=<[^>]*>[^<>]*?)(${sanitizedQuery})(?=[^<>]*?<[^>]*>)`;
-        console.log(ignoringTagsQuery);
         // create regex
         const regex = new RegExp(ignoringTagsQuery, "ig");
 
