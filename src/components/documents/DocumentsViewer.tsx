@@ -23,6 +23,7 @@ export default function DocumentsViewer(): ReactElement {
     [documents, current]
   );
 
+  // update current on carousel api change
   useEffect(() => {
     if (!api) {
       return;
@@ -34,6 +35,20 @@ export default function DocumentsViewer(): ReactElement {
       setCurrent(api.selectedScrollSnap() + 1);
     });
   }, [api]);
+
+  // reinitialize current index on documents length change
+  useEffect(() => {
+    if (api) {
+      api.reInit();
+
+      if (documents.length === 0) {
+        setCurrent(0);
+      } else {
+        setCurrent(api.selectedScrollSnap() + 1);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documents.length]);
 
   if (!thereAreUploadedDocuments) {
     return (
@@ -59,7 +74,7 @@ export default function DocumentsViewer(): ReactElement {
               Document <b>{current}</b> out of <b>{documents.length}</b>
             </p>
           </div>
-          {/* Only for centering the title and document index */}
+          {/* Only for centering the previous div */}
           <div />
         </div>
         <CarouselContent>
