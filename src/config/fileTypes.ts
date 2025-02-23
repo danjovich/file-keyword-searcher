@@ -8,7 +8,7 @@ const extensionMyMimetype = {
 } as const;
 
 const fileTypes = {
-  extensionMyMimetype,
+  extensionByMimetype: extensionMyMimetype,
   extensions: Object.values(extensionMyMimetype),
   mimeTypes: Object.keys(extensionMyMimetype),
 };

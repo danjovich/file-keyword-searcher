@@ -1,12 +1,23 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useRef, type ReactElement } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useRef,
+  useState,
+  type ReactElement,
+} from "react";
 import fileTypes from "@/config/fileTypes";
 import { upload } from "@vercel/blob/client";
 import { useDocuments } from "@/hooks/useDocuments";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { LoadingSpinner } from "./ui/loading-spinner";
 
 export default function FileUpload(): ReactElement {
   const { setDocuments } = useDocuments();
+  const [buttonEnabled, setButtonEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const onChangeFile = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ?? [];
@@ -15,8 +26,13 @@ export default function FileUpload(): ReactElement {
       if (!fileTypes.mimeTypes.includes(file.type)) {
         alert("Only .pdf, .docx, .doc and .xlsx files are allowed");
         event.target.value = "";
+        setButtonEnabled(false);
         return;
       }
+    }
+
+    if (files.length > 0) {
+      setButtonEnabled(true);
     }
   };
 
@@ -31,6 +47,7 @@ export default function FileUpload(): ReactElement {
 
     const files = inputFileRef.current.files ?? [];
 
+    setLoading(true);
     for (const file of files) {
       const blob = await upload(file.name, file, {
         access: "public",
@@ -43,23 +60,34 @@ export default function FileUpload(): ReactElement {
           uri: blob.url,
           type: blob.contentType,
           content: "",
+          name: blob.pathname,
         },
       ]);
     }
 
+    setLoading(false);
     inputFileRef.current.value = "";
+    setButtonEnabled(false);
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex gap-4 items-center">
-      <input
-        type="file"
-        onChange={onChangeFile}
-        accept={fileTypes.extensions.join(",")}
-        multiple
-        ref={inputFileRef}
-      />
-      <button type="submit">Upload</button>
-    </form>
+    <div className="flex w-full gap-4 items-center justify-center">
+      <form onSubmit={onSubmit} className="flex gap-4 items-center">
+        <Input
+          type="file"
+          onChange={onChangeFile}
+          accept={fileTypes.extensions.join(",")}
+          multiple
+          ref={inputFileRef}
+        />
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <Button type="submit" disabled={!buttonEnabled}>
+            Upload
+          </Button>
+        )}
+      </form>
+    </div>
   );
 }

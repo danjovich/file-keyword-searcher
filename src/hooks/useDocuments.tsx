@@ -7,6 +7,7 @@ interface DocumentsContextType {
     uri: string;
     content: string;
     type: string;
+    name: string;
   }[];
   setDocuments: React.Dispatch<
     React.SetStateAction<DocumentsContextType["documents"]>

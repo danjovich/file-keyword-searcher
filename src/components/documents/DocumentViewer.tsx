@@ -7,6 +7,7 @@ interface DocumentViewerProps {
   getHtml: (uri: string) => Promise<string>;
   index: number;
   type: string;
+  name: string;
 }
 
 export default function DocumentViewer({
@@ -14,6 +15,7 @@ export default function DocumentViewer({
   index,
   uri,
   type,
+  name,
 }: DocumentViewerProps): ReactElement {
   const { setDocuments, documents } = useDocuments();
 
@@ -24,7 +26,7 @@ export default function DocumentViewer({
       setHtml(data);
       setDocuments((prev) => {
         const newDocuments = [...prev];
-        newDocuments[index] = { uri, content: data, type };
+        newDocuments[index] = { uri, content: data, type, name };
         return newDocuments;
       });
     },

@@ -5,6 +5,7 @@ import FileUpload from "@/components/FileUpload";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { DocumentsProvider } from "../hooks/useDocuments";
 import SearchInput from "@/components/search/SearchInput";
+import Header from "@/components/Header";
 
 const queryClient = new QueryClient();
 
@@ -14,6 +15,7 @@ export default function Home() {
       <main className="flex flex-col gap-8 w-full row-start-2 items-center sm:items-start">
         <QueryClientProvider client={queryClient}>
           <DocumentsProvider>
+            <Header />
             <FileUpload />
             <SearchInput />
             <DocumentsViewer />
